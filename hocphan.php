@@ -1,37 +1,43 @@
 <?php
+session_start();
 include 'connect.php';
 
+if (!isset($_SESSION['MaSV'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Xử lý khi bấm nút đăng ký học phần
+if (isset($_GET['MaHP'])) {
+    $maHP = $_GET['MaHP'];
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
+    if (!in_array($maHP, $_SESSION['cart'])) {
+        $_SESSION['cart'][] = $maHP;
+    }
+    header("Location: dangky.php");
+    exit();
+}
+
+// Lấy danh sách học phần
 $sql = "SELECT * FROM HocPhan";
 $result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Danh sách học phần</title>
-    <style>
-        table { width: 70%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
-        .btn { padding: 6px 12px; background: green; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; }
-    </style>
-</head>
+<head><title>Học phần</title></head>
 <body>
-    <h2>DANH SÁCH HỌC PHẦN</h2>
-    <table>
-        <tr>
-            <th>Mã Học Phần</th>
-            <th>Tên Học Phần</th>
-            <th>Số Tín Chỉ</th>
-            <th>Thao tác</th>
-        </tr>
-        <?php while ($row = $result->fetch_assoc()): ?>
+    <h2>Danh sách học phần</h2>
+    <table border="1">
+        <tr><th>MaHP</th><th>Tên Học Phần</th><th>Số TC</th><th>Thao tác</th></tr>
+        <?php while($row = $result->fetch_assoc()): ?>
             <tr>
                 <td><?= $row['MaHP'] ?></td>
                 <td><?= $row['TenHP'] ?></td>
                 <td><?= $row['SoTinChi'] ?></td>
-                <td>
-                    <a href="dangky.php?MaHP=<?= $row['MaHP'] ?>" class="btn">Đăng ký</a>
-                </td>
+                <td><a href="hocphan.php?MaHP=<?= $row['MaHP'] ?>">Đăng ký</a></td>
             </tr>
         <?php endwhile; ?>
     </table>
